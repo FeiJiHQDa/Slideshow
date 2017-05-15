@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>焦点轮播图</title>
+    <link rel="stylesheet" type="text/css" href="../css/stata.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+    
+</head>
+<body>
+
+<!--https://www.zybuluo.com/EncyKe/note/255692-->
+
+<div id="container">
+    <div id="list" style="left: 0;">
+        <img src="img/1.jpg" alt="1"/>
+        <img src="img/2.jpg" alt="2"/>
+        <img src="img/3.jpg" alt="3"/>
+        <img src="img/4.jpg" alt="4"/>
+        <img src="img/5.jpg" alt="5"/>
+    </div>
+    <div id="buttons" >
+        <span index="0" class="on"></span>
+        <span index="1"></span>
+        <span index="2"></span>
+        <span index="3"></span>
+        <span index="4"></span>
+    </div>
+    <a href="javascript:;" id="prev" class="arrow">&lt;</a>
+    <a href="javascript:;" id="next" class="arrow">&gt;</a>
+</div>
+
+<script>
+    window.onload = function () {
+        var container = document.getElementById('container');
+        var list = document.getElementById('list');
+
+        var buttons = document.getElementById('buttons').getElementsByTagName('span');
+        var prev = document.getElementById('prev');
+        var next = document.getElementById('next');
+
+        var len = document.getElementById('list').getElementsByTagName('img').length;
+        var index = 0;  // 索引
+        var animated = false;
+
+        var interval = 3000; // 定时器时间
+        var timer;
+
+        // 根据 位置 改变图片
+        function animate(offset) {
+            animated = true;
+            var time = 300;
+            var inteval = 10;
+            var speed = offset / (time / inteval);
+
+            var left = parseInt(list.style.left) + offset;
+
+            var go = function () {
+                if ((speed > 0 && parseInt(list.style.left) < left)
+                    || (speed < 0 && parseInt(list.style.left) > left)) {
+
+                    console.log(left);
+                    list.style.left = parseInt(list.style.left) + speed + 'px';
+                    setTimeout(go, inteval);
+                } else {
+                    if (left > 0) {
+                        left = -600 * (len-1);
+                    }
+                    if (left < (-600 * (len-1))) {
+                        left = 0;
+                    }
+
+                    list.style.left = left + "px";
+
+                    animated = false;
+                }
+            };
+            go();
+        }
+
+        // 小原点
+        function showButton() {
+            for (var i = 0; i < buttons.length; i++) {
+                if (buttons[i].className === "on") {
+                    buttons[i].className = '';
+                    break;
+                }
+            }
+            buttons[index].className = "on";
+        }
+
+        // 自动播放
+        function autoPlay() {
+            timer = setTimeout(function () {
+                next.onclick();
+                autoPlay();
+            }, interval);
+        };
+        
+        function stopPlay() {
+            clearTimeout(timer);
+        }
+
+        // 箭头
+        next.onclick = function () {
+            if (animated) {
+                return;
+            }
+            if (index == len-1) {
+                index = 0;
+            } else {
+                index++;
+            }
+
+            animate(-600);
+            showButton();
+        };
+
+        prev.onclick = function () {
+            if (animated) {
+                return;
+            }
+            if (index == 0) {
+                index = 4;
+            } else {
+                index--;
+            }
+
+            animate(600);
+            showButton();
+        };
+
+        // 为每个点添加 事件
+        for (var s = 0; s < buttons.length; s++) {
+            buttons[s].onclick = function () {
+                if (animated) {
+                    return;
+                }
+
+                if(this.className === 'on') {
+                    return;
+                }
+
+                var myIndex = this.getAttribute('index');
+                var offset = -600 * (myIndex - index);
+                animate(offset);
+                index = myIndex;
+                showButton();
+            }
+        }
+
+//        container.onmouseover = stopPlay;       //
+//        container.onmouseout = autoPlay;
+//        autoPlay();
+    }
+</script>
+
+</body>
+</html>

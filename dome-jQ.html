@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>焦点轮播图</title>
+    <link rel="stylesheet" type="text/css" href="../css/stata.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css">
+
+    <script src="../js/jquery-3.1.1.min.js"></script>
+</head>
+<body>
+
+<!--https://www.zybuluo.com/EncyKe/note/255692-->
+
+<div id="container">
+    <div id="list" style="left: 0;">
+        <img src="img/1.jpg" alt="1"/>
+        <img src="img/2.jpg" alt="2"/>
+        <img src="img/3.jpg" alt="3"/>
+        <img src="img/4.jpg" alt="4"/>
+        <img src="img/5.jpg" alt="5"/>
+    </div>
+    <div id="buttons" >
+        <span index="0" class="on"></span>
+        <span index="1"></span>
+        <span index="2"></span>
+        <span index="3"></span>
+        <span index="4"></span>
+    </div>
+    <a href="javascript:;" id="prev" class="arrow">&lt;</a>
+    <a href="javascript:;" id="next" class="arrow">&gt;</a>
+</div>
+
+<script>
+
+    $(function () {
+        var container = $('#container');
+        var list = $('#list');
+
+        var buttons = $("#buttons span");
+        var prev = $('#prev');
+        var next = $('#next');
+
+        var len = $('#list img').length;
+        var index = 0;  // 索引
+        var animated = false;
+
+        var interval = 3000; // 定时器时间
+        var timer;
+
+
+        // 根据 位置 改变图片
+        function animate(offset) {
+            animated = true;
+//            var time = 300;
+//            var inteval = 10;
+//            var speed = offset / (time / inteval);
+
+            var left = parseInt(list.css('left')) + offset;
+
+            console.log(left);
+            list.animate({'left': left + 'px'}, 400, function () {
+                if (left > 0) {
+                    list.css({'left': -600  * (len -1) })
+                }
+                if (left < -600 * (len-1)) {
+                    list.css({'left': 0})
+                }
+                animated = false;
+            });
+        }
+
+        // 小原点
+        function showButton() {
+            buttons.eq(index).addClass('on').siblings().removeClass('on');
+        }
+
+        // 箭头
+        next.on('click', function () {
+            if (animated) {
+                return;
+            }
+            if (index == len-1) {
+                index = 0;
+            } else {
+                index++;
+            }
+
+            animate(-600);
+            showButton();
+        });
+
+        prev.on('click', function () {
+            if (animated) {
+                return;
+            }
+            if (index == 0) {
+                index = 4;
+            } else {
+                index--;
+            }
+
+            animate(600);
+            showButton();
+        });
+        
+        buttons.each(function () {
+            $(this).on('click', function () {
+                var _self = $(this);
+                if (animated) {
+                    return;
+                }
+
+                if (_self.attr('class') === 'on') {
+                    return;
+                }
+
+                var myIndex = _self.attr('index');
+                var offset = -600 * (myIndex - index);
+                animate(offset);
+                index = myIndex;
+                showButton();
+            })
+        })
+    })
+</script>
+
+</body>
+</html>
